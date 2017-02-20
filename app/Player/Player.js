@@ -9,6 +9,8 @@ var Player = (function () {
     Player.prototype.toJSON = function () {
         return {
             id: this.id,
+            collection: this.collection,
+            currentPack: this.currentPack,
         };
     };
     return Player;

@@ -1,15 +1,16 @@
-import _ from 'lodash';
+import { _ } from 'lodash';
 import { BoosterPack } from './BoosterPack';
 
 export class BoosterPackService {
   sets = [];
 
   createBoosterPack(setAbbr) {
-    const set = this.sets[setAbbr];
+    const set = require(`../Sets/${setAbbr}`)[setAbbr];
     const boosterPack = new BoosterPack();
-    const setGroupedByRarity = _.groupBy(set.cards, (card) => {
-      return _.toLower(card.rarity);
-    });
+    boosterPack.set = setAbbr;
+    const setGroupedByRarity = _.groupBy(set.cards, card => card.rarity.toLowerCase());
+
+    console.log(setGroupedByRarity);
 
     const isMythicPack = this.isMythicRare();
 
@@ -32,14 +33,6 @@ export class BoosterPackService {
     });
 
     return boosterPack;
-  }
-
-  setSet(setAbbr, set) {
-    this.sets[setAbbr] = set;
-  }
-
-  getSet(setAbbr) {
-    return this.sets[setAbbr];
   }
 
   // TODO: do not add duplicate cards to a pack unless its a foil

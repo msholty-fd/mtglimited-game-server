@@ -1,15 +1,19 @@
-import _ from 'lodash';
+import { _ } from 'lodash';
 
 export class BoosterPack {
   cards = [];
-
-  constructor() {
-    this.cards = [];
-  }
+  set: null;
 
   unpickedCards() {
     return _.filter(this.cards, (card) => {
       return !card.picked;
     });
+  }
+
+  toJSON() {
+    return {
+      cards: this.cards,
+      set: this.set,
+    };
   }
 }

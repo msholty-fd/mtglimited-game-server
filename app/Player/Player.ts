@@ -10,6 +10,8 @@ export class Player {
   toJSON() {
     return {
       id: this.id,
+      collection: this.collection,
+      currentPack: this.currentPack,
     };
   }
 }

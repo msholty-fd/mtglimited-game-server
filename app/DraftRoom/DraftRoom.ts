@@ -1,14 +1,18 @@
 import { Room } from 'colyseus';
 import { Player } from '../Player';
+import { BoosterPackService } from '../BoosterPackService';
 
 export class DraftRoom extends Room < any > {
+  boosterPackService = new BoosterPackService();
+
   constructor(options) {
     super(options);
     this.setPatchRate(1000);
     this.setState({
       messages: [],
-      players: {},
+      players: [],
       isDraftStarted: false,
+      activeSet: 'KLD',
     });
     console.log("ChatRoom created!", options);
   }
@@ -19,9 +23,11 @@ export class DraftRoom extends Room < any > {
 
   onJoin(client) {
     this.state.messages.push(`${ client.id } joined.`);
-    this.state.players[client.id] = new Player({
+    const newPlayer = new Player({
       id: client.id,
     });
+
+    this.state.players.push(newPlayer);
     console.log(client.id, "joined!");
   }
 
@@ -36,8 +42,7 @@ export class DraftRoom extends Room < any > {
       this.state.messages.push(data.message);
     }
 
-    this.state.isDraftStarted = !!data.isDraftStarted;
-    if (this.state.isDraftStarted) {
+    if (data.type === 'startDraft') {
       this.startDraft();
     }
 
@@ -49,6 +54,11 @@ export class DraftRoom extends Room < any > {
     // loop through each player
     // Generate a pack
     // give pack to player
+    this.state.isDraftStarted = true;
+    this.state.players.forEach((player, index) => {
+      const boosterPack = this.boosterPackService.createBoosterPack(this.state.activeSet);
+      this.state.players[index].currentPack = boosterPack;
+    });
   }
 
   onDispose() {
