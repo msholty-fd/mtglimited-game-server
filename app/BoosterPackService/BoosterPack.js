@@ -5,9 +5,7 @@ var BoosterPack = (function () {
         this.cards = [];
     }
     BoosterPack.prototype.unpickedCards = function () {
-        return lodash_1._.filter(this.cards, function (card) {
-            return !card.picked;
-        });
+        return lodash_1._.filter(this.cards, function (card) { return !card.isPicked; });
     };
     BoosterPack.prototype.toJSON = function () {
         return {

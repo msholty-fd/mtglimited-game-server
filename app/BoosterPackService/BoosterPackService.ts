@@ -9,9 +9,6 @@ export class BoosterPackService {
     const boosterPack = new BoosterPack();
     boosterPack.set = setAbbr;
     const setGroupedByRarity = _.groupBy(set.cards, card => card.rarity.toLowerCase());
-
-    console.log(setGroupedByRarity);
-
     const isMythicPack = this.isMythicRare();
 
     _.forEach(set.booster, (rarity) => {

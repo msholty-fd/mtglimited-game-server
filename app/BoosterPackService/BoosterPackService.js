@@ -11,7 +11,6 @@ var BoosterPackService = (function () {
         var boosterPack = new BoosterPack_1.BoosterPack();
         boosterPack.set = setAbbr;
         var setGroupedByRarity = lodash_1._.groupBy(set.cards, function (card) { return card.rarity.toLowerCase(); });
-        console.log(setGroupedByRarity);
         var isMythicPack = this.isMythicRare();
         lodash_1._.forEach(set.booster, function (rarity) {
             var rarityKey = rarity;

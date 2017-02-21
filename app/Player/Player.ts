@@ -1,6 +1,7 @@
 export class Player {
   collection = [];
   currentPack = {};
+  packQueue = [];
   id = null;
 
   constructor(options) {

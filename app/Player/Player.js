@@ -3,6 +3,7 @@ var Player = (function () {
     function Player(options) {
         this.collection = [];
         this.currentPack = {};
+        this.packQueue = [];
         this.id = null;
         this.id = options.id;
     }

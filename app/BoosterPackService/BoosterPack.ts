@@ -5,9 +5,7 @@ export class BoosterPack {
   set: null;
 
   unpickedCards() {
-    return _.filter(this.cards, (card) => {
-      return !card.picked;
-    });
+    return _.filter(this.cards, card => !card.isPicked);
   }
 
   toJSON() {

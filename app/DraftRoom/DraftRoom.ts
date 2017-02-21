@@ -4,6 +4,8 @@ import { BoosterPackService } from '../BoosterPackService';
 
 export class DraftRoom extends Room < any > {
   boosterPackService = new BoosterPackService();
+  passDirections = [-1, 1, -1];
+  passDirectionIndex = 0;
 
   constructor(options) {
     super(options);
@@ -11,8 +13,10 @@ export class DraftRoom extends Room < any > {
     this.setState({
       messages: [],
       players: [],
-      isDraftStarted: false,
+      isDraftActive: false,
       activeSet: 'KLD',
+      packDoneCount: 0,
+      currentPackNumber: 0,
     });
     console.log("ChatRoom created!", options);
   }
@@ -28,13 +32,11 @@ export class DraftRoom extends Room < any > {
     });
 
     this.state.players.push(newPlayer);
-    console.log(client.id, "joined!");
   }
 
   onLeave(client) {
     this.state.messages.push(`${ client.id } left.`);
     delete this.state.players[client.id];
-    console.log(this.clients);
   }
 
   onMessage(client, data) {
@@ -46,19 +48,80 @@ export class DraftRoom extends Room < any > {
       this.startDraft();
     }
 
-    console.log("DraftRoom:", client.id, data);
-    console.log(this.state);
+    if (data.type === 'pickCard') {
+      this.pickCard(client.id, data);
+      this.passPack(client.id, data);
+      if (this.state.packDoneCount === this.state.players.length) {
+        console.log('refreshing packs');
+        this.passDirectionIndex++;
+        this.refreshBoosters();
+      }
+    }
+  }
+
+  pickCard(playerId, data) {
+    const playerIndex = this.state.players.findIndex(player => player.id === playerId);
+    const player = this.state.players[playerIndex];
+    const card = player.currentPack.cards[data.cardIndex];
+
+    card.isPicked = true;
+    player.collection.push(card);
+
+    if (player.currentPack.unpickedCards().length === 0) {
+      this.state.packDoneCount++;
+    }
+  }
+
+  passPack(playerId, data) {
+    const playerIndex = this.state.players.findIndex(player => player.id === playerId);
+    const player = this.state.players[playerIndex];
+
+    let passTargetIndex = playerIndex + this.passDirections[this.passDirectionIndex];
+    if (passTargetIndex > this.state.players.length - 1) {
+      passTargetIndex = 0;
+    } else if (passTargetIndex < 0) {
+      passTargetIndex = this.state.players.length - 1;
+    }
+
+    const passTarget = this.state.players[passTargetIndex];
+    passTarget.packQueue.push(player.currentPack);
+
+    if (player.packQueue.length) {
+      player.currentPack = player.packQueue.splice(0, 1)[0];
+    } else {
+      player.currentPack = null;
+    }
+
+    this.nudgeNeighbor(passTarget);
   }
 
   startDraft() {
-    // loop through each player
-    // Generate a pack
-    // give pack to player
-    this.state.isDraftStarted = true;
-    this.state.players.forEach((player, index) => {
-      const boosterPack = this.boosterPackService.createBoosterPack(this.state.activeSet);
-      this.state.players[index].currentPack = boosterPack;
-    });
+    this.state.isDraftActive = true;
+    this.refreshBoosters();
+  }
+
+  nudgeNeighbor(passTarget) {
+    if (!passTarget.currentPack) {
+      passTarget.currentPack = passTarget.packQueue.splice(0, 1)[0];
+    }
+  }
+
+  refreshBoosters() {
+    this.state.packDoneCount = 0;
+    this.state.currentPackNumber++;
+
+    if (this.state.currentPackNumber > 3) {
+      this.endDraft();
+    } else {
+      this.state.players.forEach((player, index) => {
+        const boosterPack = this.boosterPackService.createBoosterPack(this.state.activeSet);
+        this.state.players[index].currentPack = boosterPack;
+      });
+    }
+  }
+
+  endDraft() {
+    this.state.isDraftActive = false;
   }
 
   onDispose() {
