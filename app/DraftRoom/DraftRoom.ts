@@ -21,7 +21,7 @@ export class DraftRoom extends Room < any > {
       packDoneCount: 0,
       currentPackNumber: 0,
     });
-    console.log("ChatRoom created!", options);
+    console.log("Draft created!", options);
   }
 
   requestJoin(options) {
@@ -128,6 +128,6 @@ export class DraftRoom extends Room < any > {
   }
 
   onDispose() {
-    console.log("Dispose ChatRoom");
+    console.log("Dispose Draft");
   }
 }
