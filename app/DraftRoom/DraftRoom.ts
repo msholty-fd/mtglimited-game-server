@@ -2,9 +2,12 @@ import { Room } from 'colyseus';
 import { Player } from '../Player';
 import { BoosterPackService } from '../BoosterPackService';
 
+const LEFT = -1;
+const RIGHT = 1;
+
 export class DraftRoom extends Room < any > {
   boosterPackService = new BoosterPackService();
-  passDirections = [-1, 1, -1];
+  passDirections = [LEFT, RIGHT, LEFT];
   passDirectionIndex = 0;
 
   constructor(options) {
