@@ -1,4 +1,5 @@
 import { Room } from 'colyseus';
+import * as _ from 'lodash';
 import { Player } from '../Player';
 import { BoosterPackService } from '../BoosterPackService';
 
@@ -39,7 +40,8 @@ export class DraftRoom extends Room < any > {
 
   onLeave(client) {
     this.state.messages.push(`${ client.id } left.`);
-    delete this.state.players[client.id];
+    const playerIndex = _.remove(this.state.players, player => player.id === client.id);
+    console.log(client, this.state.players, `${ client.id } left.`);
   }
 
   onMessage(client, data) {
